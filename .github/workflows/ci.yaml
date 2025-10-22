@@ -1,0 +1,25 @@
+name: App CI (Reusable)
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'demo/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'demo/**'
+
+jobs:
+  ci:
+    uses: june2git/devops-templates/.github/workflows/build_and_push_template.yml@main
+    with:
+      app_name: demo
+      build_system: gradle
+      dockerfile: demo/Dockerfile
+      context: demo
+      ecr_repo: 703671922786.dkr.ecr.ap-northeast-2.amazonaws.com/demo-app
+      aws_region: ap-northeast-2
+      gitops_repo: june2git/gitops
+      values_file: values-prod.yaml
