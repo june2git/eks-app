@@ -11,6 +11,9 @@ version = System.getenv("APP_VERSION") ?: "0.0.1-SNAPSHOT"
 
 java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
 
+repositories {
+    mavenCentral()
+}
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
