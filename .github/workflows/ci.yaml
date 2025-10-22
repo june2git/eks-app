@@ -11,6 +11,10 @@ on:
     paths:
       - 'demo/**'
 
+permissions:
+  contents: read
+  id-token: write   # OIDC for AWS ECR
+
 jobs:
   ci:
     uses: june2git/devops-templates/.github/workflows/build_and_push_template.yml@main
