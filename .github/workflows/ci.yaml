@@ -25,12 +25,14 @@ permissions:
 jobs:
   # 작업 이름: ci (Continuous Integration)
   ci:
-      # Private 저장소 접근을 위한 토큰 설정 (필요시)
-    # secrets.DEVOPS_TEMPLATES_TOKEN을 GitHub Secrets에 등록해야 함
-    token: ${{ secrets.DEVOPS_TEMPLATES_TOKEN }}
+
     # 재사용 가능한 워크플로우 호출
     # 다른 저장소의 워크플로우를 템플릿으로 사용
     uses: june2git/devops-templates/.github/workflows/build_and_push_template.yml@main
+          # Private 저장소 접근을 위한 토큰 설정 (필요시)
+    # secrets.DEVOPS_TEMPLATES_TOKEN을 GitHub Secrets에 등록해야 함
+    secrets:
+      access-token: ${{ secrets.DEVOPS_TEMPLATES_TOKEN }}
     # 템플릿 워크플로우에 전달할 입력 매개변수들
     with:
       app_name: demo                    # 애플리케이션 이름
