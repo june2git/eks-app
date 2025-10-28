@@ -31,11 +31,5 @@ public class DemoController {
     public String success() {
         return "success";
     }
-
-    @GetMapping("/last")
-    @ResponseBody
-    public String last() {
-        return "last!!!";
-    }
 }
 
