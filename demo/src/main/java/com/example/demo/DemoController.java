@@ -18,4 +18,17 @@ public class DemoController {
     public String health() {
         return "OK";
     }
+
+    @GetMapping("/test")
+    @ResponseBody
+    public String test() {
+        return "test";
+    }
+
+
+    @GetMapping("/success")
+    @ResponseBody
+    public String success() {
+        return "success";
+    }
 }
