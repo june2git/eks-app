@@ -1,45 +1,31 @@
-# 워크플로우 이름 - GitHub Actions UI에서 표시되는 이름
 name: App CI (Reusable)
 
-# 워크플로우 실행 조건 정의
 on:
-  # push 이벤트: 코드가 저장소에 푸시될 때 실행
   push:
-    branches: [ main ]  # main 브랜치에 푸시될 때만 실행
-    paths:             # 특정 경로의 파일이 변경될 때만 실행 (성능 최적화)
-      - 'demo/**'      # demo 디렉토리 내 모든 파일
-      - '.github/workflows/**'  # GitHub Actions 워크플로우 파일들
+    branches: [ main ]
+    paths:
+      - 'demo/**'
+      - '.github/workflows/**'
   
-  # pull_request 이벤트: Pull Request가 생성/업데이트될 때 실행
   pull_request:
-    branches: [ main ]  # main 브랜치로의 PR에 대해서만 실행
-    paths:             # 특정 경로의 파일이 변경된 PR에 대해서만 실행
-      - 'demo/**'      # demo 디렉토리 내 모든 파일
+    branches: [ main ]
+    paths:
+      - 'demo/**'
 
-# 워크플로우 실행에 필요한 권한 설정
 permissions:
-  contents: read       # 저장소 코드 읽기 권한 (체크아웃에 필요)
-  id-token: write      # OIDC 토큰 생성 권한 (AWS ECR 인증에 필요)
+  contents: read
+  id-token: write
 
-# 작업(jobs) 정의
 jobs:
-  # 작업 이름: ci (Continuous Integration)
   ci:
-
-    # 재사용 가능한 워크플로우 호출
-    # 다른 저장소의 워크플로우를 템플릿으로 사용
     uses: june2git/devops-templates/.github/workflows/build_and_push_template.yml@main
-          # Private 저장소 접근을 위한 토큰 설정 (필요시)
-    # secrets.DEVOPS_TEMPLATES_TOKEN을 GitHub Secrets에 등록해야 함
-    # secrets:
-    #  token: ${{ secrets.DEVOPS_TEMPLATES_TOKEN }}
-    # 템플릿 워크플로우에 전달할 입력 매개변수들
+
     with:
-      app_name: demo                    # 애플리케이션 이름
-      build_system: gradle              # 빌드 시스템 (gradle/maven/node)
-      dockerfile: demo/Dockerfile       # Dockerfile 경로
-      context: demo                     # 빌드 컨텍스트 디렉토리
-      ecr_repo: demo-app                # AWS ECR 저장소 이름
-      aws_region: ap-northeast-2        # AWS 리전 (서울)
-      gitops_repo: june2git/gitops      # GitOps 저장소 이름
-      values_file: values-prod.yaml     # Helm values 파일 경로
+      app_name: demo
+      build_system: gradle
+      dockerfile: demo/Dockerfile
+      context: demo
+      ecr_repo: demo-app
+      aws_region: ap-northeast-2
+      gitops_repo: june2git/gitops
+      values_file: values-prod.yaml
