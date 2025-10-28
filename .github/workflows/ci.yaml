@@ -19,7 +19,8 @@ permissions:
 jobs:
   ci:
     uses: june2git/devops-templates/.github/workflows/build_and_push_template.yml@main
-
+    secrets:
+      GITOPS_PAT: ${{ secrets.GITOPS_PAT }}
     with:
       app_name: demo
       build_system: gradle
@@ -28,4 +29,4 @@ jobs:
       ecr_repo: demo-app
       aws_region: ap-northeast-2
       gitops_repo: june2git/gitops
-      values_file: values-prod.yaml
+      values_file: charts/values-prod.yaml
