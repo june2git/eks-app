@@ -26,7 +26,7 @@ jobs:
   ci:
     # Reusable Workflow 호출: 공통 빌드/배포 로직을 재사용
     # devops-templates 저장소의 build_and_push_template.yml을 호출
-    uses: june2git/devops-templates/.github/workflows/build_and_push_template.yml@main
+    uses: june2git/devops-templates/.github/workflows/build_and_push_template.yaml@main
     
     # Secrets 전달: Reusable Workflow에서 필요한 민감한 정보
     secrets:
