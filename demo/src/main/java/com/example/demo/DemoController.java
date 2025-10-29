@@ -29,7 +29,7 @@ public class DemoController {
     @GetMapping("/kafka")
     @ResponseBody
     public String kafka() {
-        return "kafka";
+        return "kafka!";
     }
 }
 
