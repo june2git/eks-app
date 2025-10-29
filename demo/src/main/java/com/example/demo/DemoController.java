@@ -26,10 +26,10 @@ public class DemoController {
     }
 
 
-    @GetMapping("/success")
+    @GetMapping("/kafka")
     @ResponseBody
-    public String success() {
-        return "success";
+    public String kafka() {
+        return "kafka";
     }
 }
 
