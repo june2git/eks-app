@@ -1,0 +1,30 @@
+# Kafka Consumer CI/CD Pipeline
+# 재사용 가능한 워크플로우를 호출하여 빌드 & 배포
+name: Kafka Consumer Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'kafka-consumer/**'
+      - '.github/workflows/consumer-deploy.yaml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    # devops-templates의 재사용 가능한 워크플로우 호출
+    uses: june2git/devops-templates/.github/workflows/build_and_push_template.yaml@main
+    with:
+      app_name: kafka-consumer             # 애플리케이션 이름
+      dockerfile: kafka-consumer/Dockerfile # Dockerfile 경로
+      context: kafka-consumer               # Docker 빌드 컨텍스트
+      ecr_repo: kafka-consumer              # ECR 저장소 이름
+      aws_region: ap-northeast-2            # AWS 리전
+      gitops_repo: june2git/gitops          # GitOps 저장소
+      values_file: charts/kafka-apps-values.yaml  # Values 파일 경로
+      values_prefix: consumer               # Values 내 prefix (consumer.image.*)
+      build_system: go                      # Go 빌드 시스템
+      go_version: '1.22'                    # Go 버전
+    secrets:
+      GITOPS_PAT: ${{ secrets.GITOPS_PAT }} # GitOps 저장소 접근용 PAT
