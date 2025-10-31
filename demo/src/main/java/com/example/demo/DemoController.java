@@ -24,12 +24,5 @@ public class DemoController {
     public String test() {
         return "test";
     }
-
-
-    @GetMapping("/kafka")
-    @ResponseBody
-    public String kafka() {
-        return "kafka!";
-    }
 }
 
