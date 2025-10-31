@@ -97,7 +97,7 @@ jobs:
     with:
       app_name: kafka-producer
       build_system: go
-      go_version: '1.22'
+      go_version: '1.23'
       dockerfile: go/kafka-producer/Dockerfile
       context: go/kafka-producer
       ecr_repo: kafka-producer
@@ -120,7 +120,7 @@ jobs:
     with:
       app_name: kafka-consumer
       build_system: go
-      go_version: '1.22'
+      go_version: '1.23'
       dockerfile: go/kafka-consumer/Dockerfile
       context: go/kafka-consumer
       ecr_repo: kafka-consumer
