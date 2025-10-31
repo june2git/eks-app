@@ -217,7 +217,6 @@ func main() {
 		}
 	}()
 
-	// 종료 시그널 대기
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
