@@ -19,6 +19,7 @@ Kafka 메시지를 수신하고 저장하는 Go 기반 Consumer 애플리케이�
 GET /health
 ```
 
+
 **응답:**
 ```json
 {
