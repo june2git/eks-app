@@ -25,6 +25,7 @@ eks-app/go/
 └── README.md                # 이 파일
 ```
 
+
 ## 🎯 애플리케이션 기능
 
 ### Kafka Producer
