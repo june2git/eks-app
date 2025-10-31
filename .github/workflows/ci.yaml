@@ -1,5 +1,5 @@
 # 워크플로우 이름: GitHub Actions UI에 표시되는 이름
-name: App CI (Reusable)
+name: EKS Apps CI/CD
 
 # 워크플로우 트리거 조건: 언제 이 워크플로우가 실행될지 정의
 on:
@@ -7,14 +7,32 @@ on:
   push:
     branches: [ main ]  # main 브랜치에 push될 때만 실행
     paths:              # 특정 경로의 파일이 변경될 때만 실행 (효율성)
-      - 'demo/**'                    # demo 폴더 내 파일 변경 시
+      - 'demo/**'                    # demo 앱 변경 시
+      - 'go/kafka-producer/**'       # kafka-producer 앱 변경 시
+      - 'go/kafka-consumer/**'       # kafka-consumer 앱 변경 시
       - '.github/workflows/**'       # 워크플로우 파일 자체가 변경될 때
   
   # Pull Request 이벤트 트리거
   pull_request:
     branches: [ main ]  # main 브랜치로의 PR 생성/업데이트 시
     paths:              # PR에서 변경된 파일이 아래 경로에 있을 때만 실행
-      - 'demo/**'       # demo 폴더 내 파일이 변경된 PR
+      - 'demo/**'                    # demo 앱 변경 시
+      - 'go/kafka-producer/**'       # kafka-producer 앱 변경 시
+      - 'go/kafka-consumer/**'       # kafka-consumer 앱 변경 시
+  
+  # 수동 트리거 (GitHub UI에서 직접 실행 가능)
+  workflow_dispatch:
+    inputs:
+      app:
+        description: '배포할 애플리케이션 선택 (all/demo/producer/consumer)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - demo
+          - producer
+          - consumer
 
 # 권한 설정: 이 워크플로우가 GitHub 및 AWS에서 가질 수 있는 권한
 permissions:
@@ -23,32 +41,90 @@ permissions:
 
 # 실행할 Job 정의
 jobs:
-  ci:
-    # Reusable Workflow 호출: 공통 빌드/배포 로직을 재사용
-    # devops-templates 저장소의 build_and_push_template.yml을 호출
+  # Job 1: 변경된 파일 감지
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      demo: ${{ steps.filter.outputs.demo }}
+      producer: ${{ steps.filter.outputs.producer }}
+      consumer: ${{ steps.filter.outputs.consumer }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            demo:
+              - 'demo/**'
+            producer:
+              - 'go/kafka-producer/**'
+            consumer:
+              - 'go/kafka-consumer/**'
+
+  # Job 2: Demo App 빌드 및 배포
+  build-demo:
+    needs: detect-changes
+    # demo 앱이 변경되었거나, workflow_dispatch에서 demo/all 선택 시 실행
+    if: |
+      needs.detect-changes.outputs.demo == 'true' || 
+      github.event.inputs.app == 'demo' || 
+      github.event.inputs.app == 'all'
     uses: june2git/devops-templates/.github/workflows/build_and_push_template.yaml@main
-    
-    # Secrets 전달: Reusable Workflow에서 필요한 민감한 정보
     secrets:
-      # GitOps 저장소 접근용 Personal Access Token
-      # GitHub Secrets에 저장된 GITOPS_PAT을 전달
       GITOPS_PAT: ${{ secrets.GITOPS_PAT }}
-    
-    # 입력 매개변수: Reusable Workflow에 전달할 설정값들
     with:
-      # 애플리케이션 이름 (이미지 태그에 사용됨: demo-main-123)
       app_name: demo
-      # 빌드 시스템 타입 (gradle/maven/node 중 선택)
       build_system: gradle
-      # Dockerfile 경로 (애플리케이션 루트 기준)
       dockerfile: demo/Dockerfile
-      # Docker 빌드 컨텍스트 경로 (빌드에 포함될 파일들의 루트 디렉토리)
       context: demo
-      # ECR 저장소 이름 (AWS ECR에 생성된 저장소)
       ecr_repo: demo-app
-      # AWS 리전 (ECR 및 기타 AWS 리소스가 위치한 리전)
       aws_region: ap-northeast-2
-      # GitOps 저장소 경로 (이미지 태그를 자동 업데이트할 저장소)
       gitops_repo: june2git/gitops
-      # GitOps values 파일 경로 (이미지 태그가 저장된 Helm values 파일)
       values_file: charts/values-prod.yaml
+
+  # Job 3: Kafka Producer 빌드 및 배포
+  build-producer:
+    needs: detect-changes
+    # producer 앱이 변경되었거나, workflow_dispatch에서 producer/all 선택 시 실행
+    if: |
+      needs.detect-changes.outputs.producer == 'true' || 
+      github.event.inputs.app == 'producer' || 
+      github.event.inputs.app == 'all'
+    uses: june2git/devops-templates/.github/workflows/build_and_push_template.yaml@main
+    secrets:
+      GITOPS_PAT: ${{ secrets.GITOPS_PAT }}
+    with:
+      app_name: kafka-producer
+      build_system: go
+      go_version: '1.22'
+      dockerfile: go/kafka-producer/Dockerfile
+      context: go/kafka-producer
+      ecr_repo: kafka-producer
+      aws_region: ap-northeast-2
+      gitops_repo: june2git/gitops
+      values_file: charts/kafka-apps-values.yaml
+      values_prefix: producer
+
+  # Job 4: Kafka Consumer 빌드 및 배포
+  build-consumer:
+    needs: detect-changes
+    # consumer 앱이 변경되었거나, workflow_dispatch에서 consumer/all 선택 시 실행
+    if: |
+      needs.detect-changes.outputs.consumer == 'true' || 
+      github.event.inputs.app == 'consumer' || 
+      github.event.inputs.app == 'all'
+    uses: june2git/devops-templates/.github/workflows/build_and_push_template.yaml@main
+    secrets:
+      GITOPS_PAT: ${{ secrets.GITOPS_PAT }}
+    with:
+      app_name: kafka-consumer
+      build_system: go
+      go_version: '1.22'
+      dockerfile: go/kafka-consumer/Dockerfile
+      context: go/kafka-consumer
+      ecr_repo: kafka-consumer
+      aws_region: ap-northeast-2
+      gitops_repo: june2git/gitops
+      values_file: charts/kafka-apps-values.yaml
+      values_prefix: consumer
