@@ -3,7 +3,6 @@
 Kafka 메시지를 전송하는 Go 기반 Producer 애플리케이션
 
 
-
 ## 🚀 기능
 
 - ✅ HTTP API를 통한 메시지 전송
