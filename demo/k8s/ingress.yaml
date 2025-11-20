@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo
+  namespace: demo
+  annotations:
+    # 백엔드 프로토콜 설정
+    appgw.ingress.kubernetes.io/backend-protocol: http
+    # Health probe 경로
+    appgw.ingress.kubernetes.io/health-probe-path: /actuator/health
+spec:
+  ingressClassName: azure-application-gateway
+  rules:
+  - host: demo.june2soul.store  # DNS Zone이 설정된 경우 도메인 사용
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: demo
+            port:
+              number: 80
+
