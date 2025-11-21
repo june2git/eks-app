@@ -12,5 +12,11 @@ public class DemoController {
     public String index() {
         return "Hello World";
     }
+
+    @GetMapping("/health")
+    @ResponseBody
+    public String health() {
+        return "OK";
+    }
 }
 
