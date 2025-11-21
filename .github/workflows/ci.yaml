@@ -73,6 +73,9 @@ jobs:
     uses: june2git/devops-templates/.github/workflows/build_and_push_template.yaml@main
     secrets:
       GITOPS_PAT: ${{ secrets.GITOPS_PAT }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     with:
       app_name: demo
       build_system: gradle
