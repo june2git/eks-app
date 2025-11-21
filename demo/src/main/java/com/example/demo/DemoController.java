@@ -19,10 +19,10 @@ public class DemoController {
         return "OK";
     }
 
-    @GetMapping("/health")
+    @GetMapping("/test")
     @ResponseBody
-    public String health() {
-        return "OK";
+    public String test() {
+        return "test";
     }
 }
 
